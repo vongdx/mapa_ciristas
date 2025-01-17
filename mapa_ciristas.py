@@ -23,4 +23,4 @@ fig = px.scatter_mapbox(
 )
 
 # Mostrando o mapa
-fig.show()
+st.plotly_chart(fig)
