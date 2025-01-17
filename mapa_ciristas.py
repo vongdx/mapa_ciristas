@@ -1,26 +1,37 @@
-import pandas as pd
-import plotly
-import plotly.graph_objects as go
+import streamlit as st
 import plotly.express as px
-from geopy.geocoders import Nominatim
-from geopy.extra.rate_limiter import RateLimiter
-from geopy.exc import GeocoderTimedOut
-import plotly.io as pio
-pio.renderers.default='browser'
+import pandas as pd
 
-ciro_novo = pd.read_csv('Ciro_Novo_Com_Coordenadas.csv')
-ceps_validos_long = ciro_novo['zipcode'][ciro_novo['Longitude'].notna()]
+# Verificando se o arquivo CSV existe
+csv_file = "Ciro_Novo_Com_Coordenadas.csv"
 
-df_mapa = ciro_novo.dropna(subset=["Latitude", "Longitude"])
+try:
+    # Tenta carregar o CSV
+    df_mapa = pd.read_csv(csv_file)
+    st.write("✅ DataFrame carregado com sucesso!")
+except FileNotFoundError:
+    st.error("❌ Erro: Arquivo CSV não encontrado! Verifique se o arquivo foi enviado para o GitHub.")
+    st.stop()  # Para a execução se o CSV não for encontrado
+
+# Removendo linhas sem Latitude e Longitude
+df_mapa = df_mapa.dropna(subset=["Latitude", "Longitude"])
+
+# Verificando se as colunas existem
+if "Latitude" not in df_mapa.columns or "Longitude" not in df_mapa.columns:
+    st.error("❌ Erro: O DataFrame não contém colunas de Latitude e Longitude!")
+    st.write("🔍 Colunas encontradas:", df_mapa.columns)
+    st.stop()
+
+# Criando o mapa com Plotly
 fig = px.scatter_mapbox(
     df_mapa,
     lat="Latitude",
     lon="Longitude",
-    hover_name="name",  # Nome da pessoa para aparecer no hover
-    hover_data=["zipcode", "Logradouro", "Bairro"],  # Informações extras ao passar o mouse
-    zoom=4,  # Nível de zoom inicial
-    mapbox_style="open-street-map"  # Estilo do mapa (pode usar "carto-positron" ou outros)
+    hover_name="name",
+    hover_data=["zipcode", "Logradouro", "Bairro"],
+    zoom=4,
+    mapbox_style="open-street-map"
 )
 
-# Mostrando o mapa
+# Exibir o gráfico no Streamlit
 st.plotly_chart(fig)
