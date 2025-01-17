@@ -31,6 +31,8 @@ fig = px.scatter_mapbox(
     hover_data=["zipcode", "Logradouro", "Bairro"],
     zoom=4,
     mapbox_style="open-street-map"
+    color_discrete_sequence=["red"],  # Cor vermelha para os pontos
+    size_max=12 
 )
 
 # Exibir o gráfico no Streamlit
